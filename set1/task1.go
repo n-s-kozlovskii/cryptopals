@@ -12,7 +12,7 @@ func HexToBase64(src []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("%s\n", dst[:n])
+	fmt.Printf("task1 message: %s\n", dst[:n])
 
 	sEnc := b64.StdEncoding.EncodeToString(dst[:n])
 	return sEnc, nil
