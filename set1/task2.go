@@ -12,26 +12,23 @@ func FixedXor(left, right []byte) ([]byte, error) {
 		return []byte{}, fmt.Errorf("arrays lenght missmatched, %d != %d", len(left), len(right))
 	}
 
-	left_dec := make([]byte, hex.DecodedLen(n))
-	decoded_len, err := hex.Decode(left_dec, left)
+	res := make([]byte, n)
+
+	for i := 0; i < n; i++ {
+		res[i] = left[i] ^ right[i]
+	}
+
+	return res[:n], nil
+
+}
+
+func FixedHexXor(left, right []byte) ([]byte, error) {
+	res, err := FixedXor(BytesToHex(left), BytesToHex(right))
+	fmt.Printf("task2 message: %s\n", res)
 	if err != nil {
 		return []byte{}, err
 	}
-
-	right_dec := make([]byte, hex.DecodedLen(n))
-	_, err1 := hex.Decode(right_dec, right)
-	if err1 != nil {
-		return []byte{}, err
-	}
-	res := make([]byte, decoded_len)
-
-	for i := 0; i < decoded_len; i++ {
-		res[i] = left_dec[i] ^ right_dec[i]
-	}
-	resHex := make([]byte, hex.EncodedLen(decoded_len))
-	hex.Encode(resHex, res)
-
-	fmt.Printf("task2 message: %s\n", res[:decoded_len])
-	return resHex, nil
-
+	res2 := make([]byte, hex.EncodedLen(len(res)))
+	hex.Encode(res2, res)
+	return res2, nil
 }

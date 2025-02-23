@@ -6,18 +6,6 @@ import (
 	"strings"
 )
 
-func FixedXor2(left, right []byte) (string, error) {
-	n := len(left)
-
-	res := make([]byte, n)
-
-	for i := 0; i < n; i++ {
-		res[i] = left[i] ^ right[i]
-	}
-
-	return string(res[:n]), nil
-}
-
 func FillToLength(n int, b byte) []byte {
 	res := make([]byte, n)
 	for i := 0; i < n; i++ {
@@ -35,7 +23,7 @@ func Decypher(input string) string {
 
 	for i := 0; i < len(alphabet); i++ {
 		data := FillToLength(n, alphabet[i])
-		xor, err := FixedXor2(dst[:n], data)
+		xor, err := FixedXor(dst[:n], data)
 		if err != nil {
 			fmt.Println("FixedXor(dst[:n], data) failed")
 			log.Fatal(err)
