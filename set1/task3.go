@@ -52,7 +52,7 @@ func Decypher(input string) string {
 
 func Score(a string) int {
 	a = strings.ToUpper(a)
-	table := map[rune]int{
+	frequency := map[rune]int{
 		'E': 28,
 		'T': 27,
 		'A': 26,
@@ -83,7 +83,7 @@ func Score(a string) int {
 	}
 	var score int
 	for _, ch := range a {
-		score += table[ch]
+		score += frequency[ch]
 	}
 
 	return score
