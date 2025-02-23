@@ -80,7 +80,7 @@ func Score(a string) int {
 	}
 	var score int
 	for _, ch := range a {
-		score += frequency[unicode.ToUpper(ch)]
+		score += frequency[unicode.ToUpper(ch)] //todo mb better extend frequency
 	}
 
 	return score
