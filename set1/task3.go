@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"unicode"
 )
 
 func FillToLength(n int, b byte) []byte {
@@ -14,12 +15,13 @@ func FillToLength(n int, b byte) []byte {
 
 	return res
 }
-func Decypher(input string) string {
-	alphabet := "ETAONRISHDLFCMUGYPWBVKJXZQ"
+func Decypher(input string) (string, rune) {
+	alphabet := " !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 	dst := LiteralToHex(input)
 	n := len(dst)
 	var bestDecypher string
-	bestScore := -1
+	var bestScore int
+	var key rune
 
 	for i := 0; i < len(alphabet); i++ {
 		data := FillToLength(n, alphabet[i])
@@ -32,14 +34,21 @@ func Decypher(input string) string {
 		if score > bestScore {
 			bestDecypher = string(xor)
 			bestScore = score
+			key = rune(alphabet[i])
 		}
 	}
+	return bestDecypher, key
+}
+
+func DecypherSolver(input string) string {
+	bestDecypher, _ := Decypher(input)
 	fmt.Printf("task3 message: %s\n", bestDecypher)
 	return bestDecypher
 }
 
 func Score(a string) int {
 	a = strings.ToUpper(a)
+	//todo init map only once
 	frequency := map[rune]int{
 		'E': 28,
 		'T': 27,
@@ -71,7 +80,7 @@ func Score(a string) int {
 	}
 	var score int
 	for _, ch := range a {
-		score += frequency[ch]
+		score += frequency[unicode.ToUpper(ch)]
 	}
 
 	return score
