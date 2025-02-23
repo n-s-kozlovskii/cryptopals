@@ -2,7 +2,7 @@ package set1
 
 import "testing"
 
-func TestRun(t *testing.T) {
+func TestDecypherWholeFile(t *testing.T) {
 	want := "Now that the party is jumping"
 	got := DecypherWholeFileSolver("../testdata/task4_input.txt")
 	if got != want {
