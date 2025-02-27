@@ -80,6 +80,7 @@ project/**/metals.sbt
 
 .bsp
 .history
-.class
-.tasty
-.semanicdb
+*.class
+*.tasty
+*.semanicdb
+.scala-build/*
