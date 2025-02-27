@@ -80,3 +80,6 @@ project/**/metals.sbt
 
 .bsp
 .history
+.class
+.tasty
+.semanicdb
