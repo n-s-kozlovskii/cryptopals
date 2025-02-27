@@ -15,9 +15,15 @@ func FillToLength(n int, b byte) []byte {
 
 	return res
 }
-func Decypher(input string) (string, rune) {
-	alphabet := " !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+
+func DecypherString(input string) (string, rune) {
 	dst := LiteralToHex(input)
+	d, r, _ := Decypher(dst)
+	return d, r
+}
+
+func Decypher(dst []byte) (string, rune, int) {
+	alphabet := " !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 	n := len(dst)
 	var bestDecypher string
 	var bestScore int
@@ -37,11 +43,11 @@ func Decypher(input string) (string, rune) {
 			key = rune(alphabet[i])
 		}
 	}
-	return bestDecypher, key
+	return bestDecypher, key, bestScore
 }
 
 func DecypherSolver(input string) string {
-	bestDecypher, _ := Decypher(input)
+	bestDecypher, _ := DecypherString(input)
 	fmt.Printf("task3 message: %s\n", bestDecypher)
 	return bestDecypher
 }
@@ -80,7 +86,7 @@ func Score(a string) int {
 	}
 	var score int
 	for _, ch := range a {
-		score += frequency[unicode.ToUpper(ch)]
+		score += frequency[unicode.ToUpper(ch)] //todo mb better extend frequency
 	}
 
 	return score
