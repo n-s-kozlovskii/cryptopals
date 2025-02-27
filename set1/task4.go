@@ -20,7 +20,7 @@ func DecypherWholeFile(fileName string) string {
 	var maxScore int
 	var res string
 	for scanner.Scan() {
-		tmp, _ := Decypher(scanner.Text())
+		tmp, _ := DecypherString(scanner.Text())
 		score := Score(tmp)
 		if score > maxScore {
 			maxScore = score

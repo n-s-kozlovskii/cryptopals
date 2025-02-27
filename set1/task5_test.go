@@ -1,6 +1,8 @@
 package set1
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRepeatingKeyXor(t *testing.T) {
 	want := LiteralToHex("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272" +

@@ -1,6 +1,7 @@
 package set1
 
 import (
+	b64 "encoding/base64"
 	"fmt"
 	"os"
 )
@@ -56,19 +57,19 @@ func EstimatedKeySizeAvg(a []byte, keySize int) float32 {
 		y := a[i : i+keySize]
 		distance := HammingDistance(x, y)
 		acc += distance
-		fmt.Printf("x: %s\ty: %s, d(x,y)=%d\n", x, y, distance)
+		fmt.Printf("HammingDistance(\"%x\", \"%x\")=%d", x, y, distance)
 	}
 	res := float32(acc) / float32(2)
-	fmt.Printf("EstimatedKeySize(%d)=%f\n", keySize, res)
+	//fmt.Printf("EstimatedKeySize(%d)=%f\n", keySize, res)
 	return res
 }
 
 func EstimatedKeySize(a []byte, keySize int) float32 {
 	x := a[:keySize]
 	y := a[keySize:]
-	distance := HammingDistance(x, y)
-	fmt.Printf("keySize: %d; x: %s\ty: %s, d(x,y)=%d\n", keySize, x, y, distance)
-	return float32(distance) / float32(keySize)
+	hD := HammingDistance(x, y)
+	distance := float32(hD) / float32(keySize)
+	return distance
 }
 
 func PrepareBytes(src []byte, keySize, numBlock int) []byte {
@@ -83,6 +84,7 @@ func FindSmallestKeySizes(src []byte) (int, int, int) {
 
 	for i := 2; i < 50; i++ {
 		d := EstimatedKeySize(PrepareBytes(src, i, 2), i)
+		fmt.Printf("FindSmallestKeySizes i=%d, d=%f\n", i, d)
 		//todo wft
 		if d < s1 {
 			s1 = s2
@@ -102,37 +104,73 @@ func FindSmallestKeySizes(src []byte) (int, int, int) {
 			i3 = i
 		}
 	}
-	fmt.Printf("d[%d]=%f; d[%d]=%f; d[%d]=%f\n", i1, s1, i2, s2, i3, s3)
+	// fmt.Printf("FindSmallestKeySizes d[%d]=%f; d[%d]=%f; d[%d]=%f\n", i1, s1, i2, s2, i3, s3)
 	return i1, i2, i3
 }
 
-func SplitFile(filename string, blockSize int) [][]byte {
-	dat, err := os.ReadFile(filename)
-	check(err)
-
+func SplitFile(dat []byte, blockSize int) [][]byte {
+	fmt.Printf("SplitFile in %d len blocks, data len %d\n", blockSize, len(dat))
 	m := 0
-	// todo figure out what to do if file does not equaly separated
-	// into blocks (works for blockSize = 7 for now)
-	res := make([][]byte, len(dat)/blockSize)
+	res := make([][]byte, len(dat)/blockSize+1)
+
 	for j := blockSize; j <= len(dat); j += blockSize {
 		res[m] = dat[(j - blockSize):(j)]
 		m += 1
 	}
-	for i, block := range res {
-		fmt.Printf("%d: %s\n", i, block)
+	res[m] = make([]byte, blockSize)
+	if len(dat)%blockSize != 0 {
+		for i, b := range dat[len(dat)/blockSize*blockSize:] {
+			res[m][i] = b
+		}
 	}
-
 	return res
 }
 
 func Transponse(block [][]byte) [][]byte {
 	//todo safeguards
-	var newLen = len(block[0])
-	res := make([][]byte, newLen)
-	for i := 0; i < len(block); i++ {
-		newRow := make([]byte, len(block))
-		for j := 0; j < newLen; j++ {
+	N := len(block)
+	M := len(block[0])
+	res := make([][]byte, M)
+	//todo make one go
+	for i := 0; i < M; i++ {
+		res[i] = make([]byte, N)
+	}
 
+	for i := 0; i < N; i++ {
+		for j := 0; j < M; j++ {
+			res[j][i] = block[i][j]
 		}
 	}
+
+	return res
+}
+
+func ConstrunctKey(dat []byte, blockSize int) []byte {
+	fmt.Printf("ConstrunctKey %d block size, %d bytes\n", blockSize, len(dat))
+	blocks := SplitFile(dat, blockSize)
+	blocksT := Transponse(blocks)
+	finalKey := make([]byte, blockSize)
+	finalScore := 0
+	for i, b := range blocksT {
+		decripted, key, score := Decypher(b)
+		fmt.Printf("Decypher %d) d: %q; key: %q\n", i, decripted, key)
+		finalKey[i] = byte(key)
+		finalScore += score
+	}
+	fmt.Printf("ConstrunctKey result: blockSize %d, score %f, key: %q\n", blockSize, float32(finalScore)/float32(blockSize), finalKey)
+	return finalKey
+}
+
+func SuperF(filename string) {
+	datRaw, err := os.ReadFile(filename)
+	check(err)
+	dat := make([]byte, b64.StdEncoding.DecodedLen(len(datRaw)))
+	b64.StdEncoding.Decode(dat, datRaw)
+	// FindSmallestKeySizes(datHex)
+
+	keylen := 29
+	key := ConstrunctKey(dat, keylen)
+	fmt.Printf("1) %d\t%q\n", keylen, key)
+	res := RepeatingKeyXor(dat, key)
+	fmt.Printf("RepeatingKeyXor: %s\n", res)
 }
