@@ -11,3 +11,9 @@ func TestDecypher(t *testing.T) {
 		t.Errorf("Decypher() = %q, want %q", got, want)
 	}
 }
+
+func TestScore(t *testing.T) {
+	if Score("ionnn") != 118 {
+		t.Errorf("Decypher() = %q, want %q", Score("ionnn"), 118)
+	}
+}

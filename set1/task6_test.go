@@ -3,7 +3,6 @@ package set1
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"os"
 	"testing"
 )
@@ -25,8 +24,6 @@ func TestEstimatedKeySize(t *testing.T) {
 	}
 	data := make([]byte, base64.StdEncoding.DecodedLen(len(b64Data)))
 	base64.StdEncoding.Decode(data, b64Data)
-	// fmt.Printf("as literal: %x\n", input1)
-	fmt.Printf("from file: %x\n", data)
 
 	got := EstimatedKeySize(data, 14)
 	var want float32 = 37.0 / 14
@@ -58,7 +55,9 @@ func TestFindSmallestKeySizes(t *testing.T) {
 	base64.StdEncoding.Decode(data, b64Data)
 
 	i1, i2, i3 := FindSmallestKeySizes(data)
-	fmt.Printf("%d, %d, %d", i1, i2, i3)
+	if i1 != 5 && i2 != 29 && i3 != 40 {
+		t.Errorf("TestFindSmallestKeySizes failed, got %d, %d, %d", i1, i2, i3)
+	}
 }
 
 func TestSplitFile(t *testing.T) {
@@ -109,7 +108,7 @@ func TestTransponse(t *testing.T) {
 }
 
 func TestConstrunctKey(t *testing.T) {
-	want := []byte("iiiinirnrn")
+	want := []byte("iiiinionrn")
 	datRaw, err := os.ReadFile("../testdata/task6_input.txt")
 	if err != nil {
 		t.Error("TestBlaBla readfile failed")
@@ -120,7 +119,6 @@ func TestConstrunctKey(t *testing.T) {
 	if string(got) != string(want) {
 		t.Errorf("BlaBla()=%q, want %q", got, want)
 	}
-
 }
 
 func TestSuperF(t *testing.T) {
